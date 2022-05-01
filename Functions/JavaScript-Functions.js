@@ -10,9 +10,13 @@
  * @param {string} track Track of the fake notes
  * @param {number} p1 Starting beat
  * @param {number} p2 Ending beat
- * @example fakeNotes("fakes", 20, 30);
+ * @param {number} delay Delay of the fake notes to prevent weird jump animations
+ * @example fakeNotes("fakes", 20, 30, 0.01); // Creates fake notes from beat 20 to 30 with a delay of 0.01
  */
-function fakeNotes(track, p1, p2) {
+function fakeNotes(track, p1, p2, delay) {
+    if (typeof delay == "undefined") {
+        delay = 0;
+    };
     let realNotes = _notes.filter(n => n._time >= p1 && n._time <= p2);
     realNotes.forEach(note => {
         let fake = JSON.parse(JSON.stringify(note));
@@ -21,20 +25,21 @@ function fakeNotes(track, p1, p2) {
             _interactable: false,
             _fake: true
         };
-        //? might want to add something like "fake._time = note._time + 0.01;" to prevent weird jump animations
+        fake._time += delay;
         _notes.push(fake);
     });
+    return realNotes;
 };
 
 /**
- * 
- * @param {*} p1 Starting beat
- * @param {*} p2 Ending beat
- * @param {*} potentialOffset Offset of the note
- * @param {*} index0 Track of notes with _lineIndex 0
- * @param {*} index1 Track of notes with _lineIndex 1
- * @param {*} index2 Track of notes with _lineIndex 2
- * @param {*} index3 Track of notes with _lineIndex 3
+ * Seperates note tracks by _lineIndex
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
+ * @param {number} potentialOffset Offset of the note
+ * @param {string} index0 Track of notes with _lineIndex 0
+ * @param {string} index1 Track of notes with _lineIndex 1
+ * @param {string} index2 Track of notes with _lineIndex 2
+ * @param {string} index3 Track of notes with _lineIndex 3
  * @returns {Array} Array of notes affected 
  * @example trackOnNotesBetweenLineIndexSep(4, 6, 0, "undefined", "middleLeft", "middleRight", "undefined"); // Sets the middle left notes to track "middleLeft" and the middle right notes to track "middleRight" between beats 4 and 6
  */
@@ -67,12 +72,12 @@ function trackOnNotesBetweenLineIndexSep(
         }
     });
     return filterednotes;
-}
+};
 
 /**
  * Gives notes the _disableNoteGravity property between beats
- * @param {*} p1 Starting beat
- * @param {*} p2 Ending beat
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
  * @returns {Array} Array of notes affected
  * @example disableNoteGravity(4, 6); // Disables gravity on notes between beats 4 and 6
  */
@@ -82,12 +87,12 @@ function noGravityOnNotesBetween(p1, p2) {
         object._customData._disableNoteGravity = true;
     });
     return filterednotes;
-}
+};
 
 /**
  * Gives notes the _disableNoteLook property between beats
- * @param {*} p1 Starting beat
- * @param {*} p2 Ending beat
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
  * @returns {Array} Array of notes affected
  * @example disableNoteLook(4, 6); // Disables look on notes between beats 4 and 6
  */
@@ -97,9 +102,68 @@ function noRotateOnNotesBetween(p1, p2) {
         object._customData._disableNoteLook = true;
     });
     return filterednotes;
-}
+};
+
+/**
+ * Gives notes the _disableSpawnEffect property between beats
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
+ * @returns {Array} Array of notes affected
+ * @example noSpawnEffectOnNotesBetween(4, 6); // Disables spawn effect on notes between beats 4 and 6
+ */
+function noSpawnEffectOnNotesBetween(p1, p2) {
+    filterednotes = _notes.filter(n => n._time >= p1 && n._time <= p2);
+    filterednotes.forEach(object => {
+        object._customData._disableSpawnEffect = true;
+    });
+    return filterednotes;
+};
+
+/**
+ * Gives notes with a track a start beat offset
+ * @param {string} track Track of the notes
+ * @param {number} offset Offset of the notes
+ * @param {number} njs Note jump speed of the notes
+ * @returns {Array} Array of notes affected
+ * @example offestOnTrack("deepNotes", 8, 10); // Gives 8 offset and 10 njs to track "deepNotes"
+ */
+function offestOnTrack(track, offset, njs) {
+    filterednotes = _notes.filter(n => n._customData._track == track);
+    filterednotes.forEach(object => {
+        if (typeof offset !== "undefined") {
+            object._customData._noteJumpStartBeatOffset = offset;
+        }
+        if (typeof njs !== "undefined") {
+            object._customData._noteJumpMovementSpeed = njs;
+        }
+    });
+    return filterednotes;
+};
 
 //*** Walls / Obstacles ***
+
+/**
+ * Gives offset to walls between beats
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
+ * @param {number} offset Start beat offset of the walls
+ * @param {number} njs Note jump speed of the walls
+ * @returns {Array} Array of walls affected
+ * @example offsetWalls(4, 6, 3, 22); // Gives offset of 3 and njs of 22 to walls between beats 4 and 6
+ */
+function offestOnWallsBetween(p1, p2, offset, njs) {
+    filteredwalls = _obstacles.filter(n => n._time >= p1 && n._time <= p2);
+    filteredwalls.forEach(object => {
+        // insert Mawntee joke here
+        if (typeof offset !== "undefined") {
+            object._customData._noteJumpStartBeatOffset = offset;
+        }
+        if (typeof njs !== "undefined") {
+            object._customData._noteJumpMovementSpeed = njs;
+        }
+    });
+    return filteredwalls;
+};
 
 /**
  * Generates a regular polygon
@@ -148,8 +212,8 @@ function genPolygon(track, xPos, yPos, time, radius, sides, thic) {
 
 /**
  * Sets obstacles with custom data to _fake true and _interactable false between beats, useful for lowering lag
- * @param {*} p1 Starting beat
- * @param {*} p2 Ending beat
+ * @param {number} p1 Starting beat
+ * @param {number} p2 Ending beat
  * @returns {Array} Array of obstacles affected
  * @example fakeObstacles(4, 6); // Sets obstacles with custom data between beats 4 and 6 to be fake and non interactable
  * @example fakeObstacles(); // Sets all obstacles with custom data to be fake and non interactable
@@ -210,6 +274,56 @@ function shakePos(power, speed) {
  * @returns {Array} Array of three random 0-1 values
  */
 const randomColor = () => [Math.random(), Math.random(), Math.random()];
+
+/**
+ * Have objects come into the area invisible
+ * @param {string} track Track that's coming in
+ * @param {number} entering What time the track will appear
+ * @example comeInSilent("text", 28); // The track "text" will enter hidden at beat 28
+ */
+function comeInSilent(track, entering) {
+    _customEvents.push({
+        _time: entering - 10,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "gone"
+        }
+    }, {
+        _time: entering,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "back"
+        }
+    });
+};
+
+/**
+ * Have notes come into the area invisible
+ * @param {string} track Track that's coming in
+ * @param {number} entering What time the notes will appear
+ * @example comeInSilent("text", 28); // The notes with track "text" will enter hidden at beat 28
+ */
+ function comeInSilentNote(track, entering) {
+    _customEvents.push({
+        _time: entering - 10,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "gone",
+            _dissolveArrow: "gone"
+        }
+    }, {
+        _time: entering,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "back",
+            _dissolveArrow: "back"
+        }
+    });
+};
 
 //*** Other Stuff ***
 
