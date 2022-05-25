@@ -41,7 +41,7 @@ function fakeNotes(track, p1, p2, delay) {
  * @param {string} index2 Track of notes with _lineIndex 2
  * @param {string} index3 Track of notes with _lineIndex 3
  * @returns {Array} Array of notes affected 
- * @example trackOnNotesBetweenLineIndexSep(4, 6, 0, "undefined", "middleLeft", "middleRight", "undefined"); // Sets the middle left notes to track "middleLeft" and the middle right notes to track "middleRight" between beats 4 and 6
+ * @example trackOnNotesBetweenLineIndexSep(4, 6, 0, undefined, "middleLeft", "middleRight", undefined); // Sets the middle left notes to track "middleLeft" and the middle right notes to track "middleRight" between beats 4 and 6
  */
 function trackOnNotesBetweenLineIndexSep(
     p1,
@@ -279,9 +279,10 @@ const randomColor = () => [Math.random(), Math.random(), Math.random()];
  * Have objects come into the area invisible
  * @param {string} track Track that's coming in
  * @param {number} entering What time the track will appear
- * @example comeInSilent("text", 28); // The track "text" will enter hidden at beat 28
+ * @param {number} duration The length of the fade time
+ * @example comeInSilent("text", 28, 0.5); // The track "text" will enter hidden at beat 28
  */
-function comeInSilent(track, entering) {
+ function comeInSilent(track, entering, duration) {
     _customEvents.push({
         _time: entering - 10,
         _type: "AnimateTrack",
@@ -294,7 +295,8 @@ function comeInSilent(track, entering) {
         _type: "AnimateTrack",
         _data: {
             _track: track,
-            _dissolve: "back"
+            _dissolve: "appear", //? requires a point definition
+            _duration: duration
         }
     });
 };
@@ -303,9 +305,10 @@ function comeInSilent(track, entering) {
  * Have notes come into the area invisible
  * @param {string} track Track that's coming in
  * @param {number} entering What time the notes will appear
- * @example comeInSilent("text", 28); // The notes with track "text" will enter hidden at beat 28
+ * @param {number} duration The length of the fade time
+ * @example comeInSilentNote("text", 28, 0.5); // The notes with track "text" will enter hidden at beat 28
  */
- function comeInSilentNote(track, entering) {
+function comeInSilentNote(track, entering, duration) {
     _customEvents.push({
         _time: entering - 10,
         _type: "AnimateTrack",
@@ -319,15 +322,97 @@ function comeInSilent(track, entering) {
         _type: "AnimateTrack",
         _data: {
             _track: track,
-            _dissolve: "back",
-            _dissolveArrow: "back"
+            _dissolve: "appear", //? requires a point definition
+            _dissolveArrow: "appear", //?
+            _duration: duration
+        }
+    });
+};
+
+/**
+ * Have objects come into the area invisible and stay there
+ * @param {string} track Track that's coming in
+ * @param {number} entering What time the track will appear
+ * @param {number} duration The length of the fade time
+ * @example stayInSilent("text", 28, 0.5); // The track "text" will enter hidden at beat 28 and stay at time 0.5
+ */
+function stayInSilent(track, entering, duration) {
+    _customEvents.push({
+        _time: entering - 10,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "gone"
+        }
+    }, {
+        _time: entering,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "appear", //? requires a point definition
+            _time: "hold",
+            _duration: duration
+        }
+    });
+};
+
+/**
+ * Have notes come into the area invisible and stay there
+ * @param {string} track Track that's coming in
+ * @param {number} entering What time the notes will appear
+ * @param {number} duration The length of the fade time
+ * @example stayInSilentNote("text", 28, 0.5); // The notes with track "text" will enter hidden at beat 28 and stay at time 0.5
+ */
+function stayInSilentNote(track, entering, duration) {
+    _customEvents.push({
+        _time: entering - 10,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "gone",
+            _dissolveArrow: "gone"
+        }
+    }, {
+        _time: entering,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "appear", //? requires a point definition
+            _dissolveArrow: "appear", //?
+            _time: "hold",
+            _duration: duration
+        }
+    });
+};
+
+/**
+ * Have objects despawn at a certain time
+ * @param {string} track Track that's leaving
+ * @param {number} leaving Time the track will leave
+ * @param {number} duration The length of the fade time
+ */
+function leave(track, leaving, duration) {
+    _customEvents.push({
+        _time: leaving,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _dissolve: "gone",
+            _duration: duration
+        }
+    }, {
+        _time: leaving + duration,
+        _type: "AnimateTrack",
+        _data: {
+            _track: track,
+            _time: [1.1] //? you might want to change this
         }
     });
 };
 
 //*** Other Stuff ***
 
-const bpm = 150; //? if you're using a template, you could have this defined already
+const bpm = 150; //! NOTICE: if you're using a template, you could have this defined already
 /**
  * Finds the duration of something after a BPM change
  * @param {number} newBPM The new BPM from a BPM change
