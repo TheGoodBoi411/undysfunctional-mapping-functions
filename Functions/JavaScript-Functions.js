@@ -1,5 +1,6 @@
 //* Functions for use in JavaScript
-//* Use the VSCode "Better Comments" extension for enhanced viewing
+//* Use the VSCode "Better Comments" extension for easier reading & navigation
+//? This list does not contain functions found in other templates
 
 ///////////////////////////////////////////////////////////////////
 
@@ -13,8 +14,8 @@
  * @param {number} delay Delay of the fake notes to prevent weird jump animations
  * @example fakeNotes("fakes", 20, 30, 0.01); // Creates fake notes from beat 20 to 30 with a delay of 0.01
  */
-function fakeNotes(track, p1, p2, delay) {
-    if (typeof delay == "undefined") {
+ function fakeNotes(track, p1, p2, delay) {
+    if (!delay) {
         delay = 0;
     };
     let realNotes = _notes.filter(n => n._time >= p1 && n._time <= p2);
@@ -46,28 +47,28 @@ function fakeNotes(track, p1, p2, delay) {
 function trackOnNotesBetweenLineIndexSep(
     p1,
     p2,
-    potentialOffset,
     index0,
     index1,
     index2,
-    index3
+    index3,
+    potentialOffset
 ) {
     filterednotes = _notes.filter(n => n._time >= p1 && n._time <= p2);
     filterednotes.forEach(object => {
-        if (object._lineIndex == 0 && typeof index0 !== "undefined") {
+        if (object._lineIndex == 0 && index0) {
             object._customData._track = index0;
         };
-        if (object._lineIndex == 1 && typeof index1 !== "undefined") {
+        if (object._lineIndex == 1 && index1) {
             object._customData._track = index1;
         };
-        if (object._lineIndex == 2 && typeof index2 !== "undefined") {
+        if (object._lineIndex == 2 && index2) {
             object._customData._track = index2;
         };
-        if (object._lineIndex == 3 && typeof index3 !== "undefined") {
+        if (object._lineIndex == 3 && index3) {
             object._customData._track = index3;
         };
-        // why this here tho
-        if (typeof potentialOffset !== "undefined") {
+        // just in case
+        if (potentialOffset) {
             object._customData._noteJumpStartBeatOffset = potentialOffset;
         }
     });
@@ -130,12 +131,12 @@ function noSpawnEffectOnNotesBetween(p1, p2) {
 function offestOnTrack(track, offset, njs) {
     filterednotes = _notes.filter(n => n._customData._track == track);
     filterednotes.forEach(object => {
-        if (typeof offset !== "undefined") {
+        if (offset) {
             object._customData._noteJumpStartBeatOffset = offset;
-        }
-        if (typeof njs !== "undefined") {
+        };
+        if (njs) {
             object._customData._noteJumpMovementSpeed = njs;
-        }
+        };
     });
     return filterednotes;
 };
@@ -155,12 +156,12 @@ function offestOnWallsBetween(p1, p2, offset, njs) {
     filteredwalls = _obstacles.filter(n => n._time >= p1 && n._time <= p2);
     filteredwalls.forEach(object => {
         // insert Mawntee joke here
-        if (typeof offset !== "undefined") {
+        if (offset) {
             object._customData._noteJumpStartBeatOffset = offset;
-        }
-        if (typeof njs !== "undefined") {
+        };
+        if (njs) {
             object._customData._noteJumpMovementSpeed = njs;
-        }
+        };
     });
     return filteredwalls;
 };
@@ -177,7 +178,7 @@ function offestOnWallsBetween(p1, p2, offset, njs) {
  * @example genPolygon("octagon", 0, 2, 20, 3, 8, 0.2); // Creates an octagon at (0, 2) at beat 20 with radius 3, thickness 0.2, and track "octagon"
  */
 function genPolygon(track, xPos, yPos, time, radius, sides, thic) {
-    if (typeof thic == "undefined") {thic = 0.3};
+    if (!thic) {thic = 0.3};
     let angle = -90;
     let length = round((2 * radius * Math.tan(Math.PI / sides)), 4);
     // pay attention in geometry class
@@ -219,17 +220,29 @@ function genPolygon(track, xPos, yPos, time, radius, sides, thic) {
  * @example fakeObstacles(); // Sets all obstacles with custom data to be fake and non interactable
  */
 function fakeObstacles(p1, p2) {
-    if (typeof p1 !== "undefined") {
+    if (p1) {
         let filteredObstacles = _obstacles.filter(n => n._time >= p1 && n._time <= p2);
         filteredObstacles.forEach(object => {
-            object._customData._fake = true;
-            object._customData._interactable = false;
+            if (object._customData) {
+                if (object._customData._fake !== false) {
+                    object._customData._fake = true;
+                };
+                if (object._customData._interactable !== true) {
+                    object._customData._interactable = false;
+                };
+            };
         });
         return filteredObstacles;
-    } else {
+    } else { // this probably isn't the best way to do this
         _obstacles.forEach(object => {
-            object._customData._fake = true;
-            object._customData._interactable = false;
+            if (object._customData) {
+                if (object._customData._fake !== false) {
+                    object._customData._fake = true;
+                };
+                if (object._customData._interactable !== true) {
+                    object._customData._interactable = false;
+                };
+            };
         });
         return _obstacles;
     }
