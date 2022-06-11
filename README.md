@@ -5,7 +5,12 @@
 
 ---
 
-* These functions assume that you already have code set up for importing and exporting your map, so just put these functions wherever you feel like
+## Languages & Tools:
+* JavaScript
+* ~~ReMapper~~ (soon™)
+
+## Also:
+* These functions assume that you already have code set up for importing and exporting your map, so just paste these functions wherever you feel like
 * Comments and other `@params` have been put in to make things easier to use
 * This repository is not meant for just my functions. So if you want to add your own, or just optimize mine, DM me at `TheGoodBoi#3330` or submit a pull request
 * If you want more functions in the meantime, you can look at some other templates:
