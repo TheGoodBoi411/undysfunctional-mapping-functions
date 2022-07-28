@@ -7,7 +7,7 @@
 
 ## Languages & Tools:
 * JavaScript
-* ~~ReMapper~~ (soon™)
+* ReMapper (WIP)
 
 ## Also:
 * These functions assume that you already have code set up for importing and exporting your map, so just paste these functions wherever you feel like
