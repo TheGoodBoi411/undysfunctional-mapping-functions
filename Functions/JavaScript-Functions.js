@@ -1,3 +1,4 @@
+// deno-lint-ignore-file
 //* Functions for use in JavaScript
 //* Use the VSCode "Better Comments" extension for easier reading & navigation
 //? This list does not contain functions found in other templates
