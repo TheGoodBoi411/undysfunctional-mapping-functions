@@ -11,6 +11,8 @@ const map = new Difficulty("ExpertPlusLawless.dat", "ExpertPlusStandard.dat");
 
 ///////////////////////////////////////////////////////////////////
 
+//*** Notes / Bloqs ***
+
 /**
  * @use **Assign a track to notes in a range**
  * @param track The track to assign notes to
@@ -77,17 +79,41 @@ function dupeNotes (start:number, end:number, newTrack:string, delay?:number, fa
     });
 };
 
+//*** General Use ***
+
 /**
  * @use **Create a set of point definitions for shaking things**
- * @param power How much to shake
+ * @param pow How much to shake
  * @param quick Delay between points
+ * @param threeD If the shaking is 3d instead of 2d
  * @returns {Array} An array of shake points
  * @example shake(0.2, 0.125);
  */
-function shake(power:number, quick:number) {
+function shake(pow:number, quick:number, threeD?:boolean) {
     let shakePoints = [];
-    for (let time = 0; time <= 1; time += quick * 4) {
-        shakePoints.push( [power, power, 0, time], [-power, -power, 0, time + quick], [-power, power, 0, time + quick * 2], [power, -power, 0, time + quick * 3] );
+    if (!threeD) {
+        for (let time = 0; time <= 1; time += quick * 4) {
+            shakePoints.push(
+                [ pow,  pow, 0, time],
+                [-pow, -pow, 0, time + quick],
+                [-pow,  pow, 0, time + quick * 2],
+                [ pow, -pow, 0, time + quick * 3]
+            );
+        };
+    } else {
+        for (let time = 0; time <= 1; time += quick * 8) {
+            shakePoints.push(
+                [-pow, -pow, -pow, time],
+                [ pow, -pow, -pow, time + quick],
+                [-pow, -pow,  pow, time + quick * 2],
+                [ pow, -pow,  pow, time + quick * 3],
+                [-pow,  pow, -pow, time + quick * 4],
+                [ pow,  pow, -pow, time + quick * 5],
+                [-pow,  pow,  pow, time + quick * 6],
+                [ pow,  pow,  pow, time + quick * 7]
+            );
+        };
     };
+    while (shakePoints[shakePoints.length - 1][3] > 1) { shakePoints.pop() };
     return shakePoints;
 };
